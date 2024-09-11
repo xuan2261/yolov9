@@ -172,13 +172,27 @@ class ComputeLoss:
         feats = p[1][0] if isinstance(p, tuple) else p[0]
         feats2 = p[1][1] if isinstance(p, tuple) else p[1]
         
-        pred_distri, pred_scores = torch.cat([xi.view(feats[0].shape[0], self.no, -1) for xi in feats], 2).split(
+        # pred_distri, pred_scores = torch.cat([xi.view(feats[0].shape[0], self.no, -1) for xi in feats], 2).split(
+        #     (self.reg_max * 4, self.nc), 1)
+
+        # Code đã được sửa đổi cho pred_distri, pred_scores
+        feat_shape = feats[0].shape 
+        last_dim = feat_shape[1] * feat_shape[2] * feat_shape[3] // self.no 
+        pred_distri, pred_scores = torch.cat([xi.view(feat_shape[0], self.no, last_dim) for xi in feats], 2).split(
             (self.reg_max * 4, self.nc), 1)
+        
         pred_scores = pred_scores.permute(0, 2, 1).contiguous()
         pred_distri = pred_distri.permute(0, 2, 1).contiguous()
         
-        pred_distri2, pred_scores2 = torch.cat([xi.view(feats2[0].shape[0], self.no, -1) for xi in feats2], 2).split(
+        # pred_distri2, pred_scores2 = torch.cat([xi.view(feats2[0].shape[0], self.no, -1) for xi in feats2], 2).split(
+        #     (self.reg_max * 4, self.nc), 1)
+        
+        # Code đã được sửa đổi cho pred_distri2, pred_scores2
+        feat_shape2 = feats2[0].shape 
+        last_dim2 = feat_shape2[1] * feat_shape2[2] * feat_shape2[3] // self.no 
+        pred_distri2, pred_scores2 = torch.cat([xi.view(feat_shape2[0], self.no, last_dim2) for xi in feats2], 2).split(
             (self.reg_max * 4, self.nc), 1)
+        
         pred_scores2 = pred_scores2.permute(0, 2, 1).contiguous()
         pred_distri2 = pred_distri2.permute(0, 2, 1).contiguous()
 
